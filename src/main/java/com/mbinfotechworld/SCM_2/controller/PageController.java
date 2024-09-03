@@ -2,18 +2,27 @@ package com.mbinfotechworld.SCM_2.controller;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-;
+import org.springframework.web.bind.annotation.RequestMethod;
+import com.mbinfotechworld.SCM_2.entitiy.User;
+import com.mbinfotechworld.SCM_2.form.UserForm;
+import com.mbinfotechworld.SCM_2.serviceImpl.UserServiceImpl;
 
 @Controller
 public class PageController {
 
 
+    UserServiceImpl userServiceImpl;
+
+    public PageController(UserServiceImpl userServiceImpl) {
+        this.userServiceImpl  = userServiceImpl;
+    }
+
     @RequestMapping("/home")
     public String home(Model model) {
-        model.addAttribute("name","MB Infotech World");
-        model.addAttribute("youtube","Java Learning");
+        model.addAttribute("name", "MB Infotech World");
+        model.addAttribute("youtube", "Java Learning");
         System.out.println("Home page Handller");
         return "home";
     }
@@ -43,12 +52,27 @@ public class PageController {
     }
 
     @RequestMapping("/signup")
-    public String signup() {
-        System.out.println("signup page");
-        return "signup";
+    public String signup(Model model) {
+
+    UserForm userForm = new UserForm();
+    model.addAttribute("userForm", userForm);
+         return "signup";
     }
 
+    // processing register
+    @RequestMapping(value = "/do_register", method = RequestMethod.POST)
+    public String requestMethodName(@ModelAttribute UserForm userForm) {
+        User user = new User();
+        user.setUserName(userForm.getName());
+        user.setEmail(userForm.getEmail());
+        user.setPassword(userForm.getPassword());
+        user.setPhoneNo(userForm.getPhoneNumber());
+        user.setAbout(userForm.getAbout());
+        user.setProfilePic("https://mbinfotechworld.com/wp-content/uploads/2024/04/economy-3213967_1280.jpg");
 
-
+        userServiceImpl.saveUser(user);
+        System.out.println("user data save successfully....");
+        return "redirect:/signup";
+    }
 
 }
