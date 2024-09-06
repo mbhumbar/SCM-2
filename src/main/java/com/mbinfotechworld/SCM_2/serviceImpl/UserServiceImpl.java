@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.mbinfotechworld.SCM_2.entitiy.User;
+import com.mbinfotechworld.SCM_2.helpers.ResourcesNotFoundException;
 import com.mbinfotechworld.SCM_2.repository.UserRepository;
 import com.mbinfotechworld.SCM_2.services.UserServices;
 
@@ -30,45 +31,53 @@ public class UserServiceImpl implements UserServices {
 
     @Override
     public Optional<User> getUserById(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getUserById'");
+     return userRepository.findById(id);  
     }
 
     @Override
     public Optional<User> updateUser(User user) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateUser'");
+         User userData  = userRepository.findById(user.getUser_id())
+         .orElseThrow(() -> new ResourcesNotFoundException("User Not Found.."));
+         // update the user
+         userData.setUserName(user.getUserName());
+         userData.setEmail(user.getEmail());
+         userData.setPassword(user.getPassword());
+         userData.setPhoneNo(user.getPhoneNo());
+         userData.setProfilePic(user.getProfilePic());
+         userData.setEnable(user.isEnable());
+         userData.setProviders(user.getProviders());
+         userData.setProviderUserId(user.getProviderUserId());
+        User save = userRepository.save(userData);
+        return Optional.ofNullable(save);
     }
+
 
     @Override
     public void deleteUser(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteUser'");
+        User userdata = userRepository.findById(id)
+        .orElseThrow(() -> new ResourcesNotFoundException("User not found"));
+        userRepository.delete(userdata);
     }
 
     @Override
     public boolean isUserExist(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isUserExist'");
+       User user = userRepository.findById(id).orElse(null);
+        return user != null ? true:false;
     }
 
     @Override
     public boolean isUserExistByEmail(String email) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'isUserExistByEmail'");
+        User user = userRepository.findByEmail(email).orElse(null);
+        return user != null ? true:false;
     }
 
     @Override
     public List<User> getAllUsers() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAllUsers'");
+        return userRepository.findAll();
     }
 
     @Override
     public Optional<User> getUserByEmail(String email) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getUserByEmail'");
+        return Optional.ofNullable(userRepository.findByEmail(email).orElse(null));
     }
-
-
 }
